@@ -6,7 +6,6 @@
 // @author       pywal-themer
 // @match        https://*.youtube.com/*
 // @match        https://github.com/*
-// @match        https://*.reddit.com/*
 // @match        https://x.com/*
 // @match        https://twitter.com/*
 // @grant        none
@@ -97,9 +96,9 @@
             :root {
                 --yt-spec-base-background: ${s.base} !important;
                 --yt-spec-raised-background: ${s.base} !important;
-                --yt-spec-menu-background: ${s.mantle} !important;
+                --yt-spec-menu-background: ${s.base} !important;
                 --yt-spec-inverted-background: ${s.text} !important;
-                --yt-spec-additive-background: ${s.surface0} !important;
+                --yt-spec-additive-background: ${s.base} !important;
                 --yt-spec-outline: ${s.border} !important;
                 --yt-spec-shadow: ${s.crust} !important;
                 --yt-spec-text-primary: ${s.text} !important;
@@ -152,14 +151,14 @@
                 --yt-spec-assistive-feed-themed-gradient-3: #ff4444 !important;
                 --yt-spec-brand-background-solid: ${s.base} !important;
                 --yt-spec-brand-background-primary: ${s.base} !important;
-                --yt-spec-brand-background-secondary: ${s.mantle} !important;
+                --yt-spec-brand-background-secondary: ${s.base} !important;
                 --yt-spec-general-background-a: ${s.base} !important;
                 --yt-spec-general-background-b: ${s.base} !important;
-                --yt-spec-general-background-c: ${s.crust} !important;
+                --yt-spec-general-background-c: ${s.base} !important;
                 --yt-spec-error-background: ${s.base} !important;
                 --yt-spec-10-percent-layer: ${s.surface0} !important;
-                --yt-spec-snackbar-background: ${s.mantle} !important;
-                --yt-spec-snackbar-background-updated: ${s.mantle} !important;
+                --yt-spec-snackbar-background: ${s.base} !important;
+                --yt-spec-snackbar-background-updated: ${s.base} !important;
                 --yt-spec-badge-chip-background: ${s.surface1} !important;
                 --yt-spec-verified-badge-background: ${s.overlay0} !important;
                 --yt-spec-call-to-action-fadeoutd: ${s.accent}4d !important;
@@ -181,7 +180,15 @@
             }
             
             ytd-masthead#masthead, #masthead {
-                background: ${s.mantle} !important;
+                background: ${s.base} !important;
+            }
+
+            ytd-mini-guide-renderer,
+            ytd-guide-renderer,
+            tp-yt-app-drawer,
+            #guide-content {
+                background: ${s.base} !important;
+                color: ${s.text} !important;
             }
             
             #video-title, #video-title-link {
@@ -198,19 +205,120 @@
             }
             
             ytd-button-renderer yt-button-shape button {
-                background: ${s.accent} !important;
-                color: ${s.crust} !important;
+                background: ${s.surface1} !important;
+                color: ${s.text} !important;
+                border: 1px solid ${s.border} !important;
+                box-shadow: none !important;
+            }
+
+            ytd-button-renderer yt-button-shape button:hover {
+                background: ${s.surface0} !important;
             }
             
             ytd-searchbox {
-                background: ${s.surface0} !important;
+                background: ${s.base} !important;
+                border: 1px solid ${s.border} !important;
+                box-shadow: none !important;
             }
             
             ytd-searchbox input {
                 color: ${s.text} !important;
+                background: transparent !important;
+            }
+
+            /* Topbar icon buttons (mic/create/notifications) - keep flat like sidebar */
+            #voice-search-button button,
+            ytd-topbar-menu-button-renderer tp-yt-paper-icon-button,
+            ytd-notification-topbar-button-renderer tp-yt-paper-icon-button,
+            ytd-masthead yt-icon-button,
+            tp-yt-paper-icon-button,
+            yt-icon-button {
+                background: transparent !important;
+                box-shadow: none !important;
+                color: ${s.text} !important;
+                fill: ${s.text} !important;
+            }
+
+            /* + Create button (signed-in) */
+            ytd-masthead #create-button,
+            ytd-masthead #create-button button,
+            ytd-masthead #create-button a,
+            ytd-masthead ytd-button-renderer#button,
+            ytd-masthead ytd-button-renderer button,
+            ytd-masthead yt-button-shape button {
+                background: transparent !important;
+                color: ${s.text} !important;
+                border-color: ${s.border} !important;
+                box-shadow: none !important;
+            }
+
+            ytd-masthead #create-button:hover,
+            ytd-masthead #create-button button:hover,
+            ytd-masthead #create-button a:hover,
+            ytd-masthead ytd-button-renderer#button:hover,
+            ytd-masthead ytd-button-renderer button:hover,
+            ytd-masthead yt-button-shape button:hover {
+                background: ${s.surface1} !important;
+            }
+
+            #voice-search-button button:hover,
+            ytd-topbar-menu-button-renderer tp-yt-paper-icon-button:hover,
+            ytd-notification-topbar-button-renderer tp-yt-paper-icon-button:hover,
+            ytd-masthead yt-icon-button:hover,
+            tp-yt-paper-icon-button:hover,
+            yt-icon-button:hover {
+                background: ${s.surface1} !important;
             }
             
-            ytd-rich-item-renderer {
+            ytd-rich-item-renderer,
+            ytd-rich-grid-media,
+            ytd-video-renderer,
+            ytd-compact-video-renderer,
+            ytd-grid-video-renderer,
+            ytd-rich-section-renderer {
+                background: ${s.base} !important;
+                box-shadow: none !important;
+                border: 0 !important;
+            }
+
+            ytd-rich-grid-renderer,
+            #contents.ytd-rich-grid-renderer {
+                background: ${s.base} !important;
+            }
+
+            /* Watch page: action buttons (like/share/save/etc) */
+            #top-level-buttons-computed yt-button-shape button,
+            ytd-menu-renderer yt-button-shape button,
+            ytd-segmented-like-dislike-button-renderer yt-button-shape button {
+                background: ${s.surface1} !important;
+                color: ${s.text} !important;
+                border: 1px solid ${s.border} !important;
+                box-shadow: none !important;
+            }
+
+            #top-level-buttons-computed yt-button-shape button:hover,
+            ytd-menu-renderer yt-button-shape button:hover,
+            ytd-segmented-like-dislike-button-renderer yt-button-shape button:hover {
+                background: ${s.surface0} !important;
+            }
+
+            /* Category chips row */
+            yt-chip-cloud-chip-renderer,
+            yt-chip-cloud-chip-renderer yt-chip-cloud-chip-renderer,
+            yt-chip-cloud-chip-renderer #chip-container,
+            yt-chip-cloud-chip-renderer tp-yt-paper-button {
+                background: ${s.surface1} !important;
+                color: ${s.text} !important;
+                border: 1px solid ${s.border} !important;
+                box-shadow: none !important;
+            }
+
+            yt-chip-cloud-chip-renderer[chip-style="STYLE_DEFAULT"] {
+                background: ${s.surface1} !important;
+            }
+
+            yt-chip-cloud-chip-renderer[aria-selected="true"],
+            yt-chip-cloud-chip-renderer[selected] {
                 background: ${s.surface0} !important;
             }
         `;
@@ -220,9 +328,9 @@
         return `
             :root {
                 --color-canvas-default: ${s.base} !important;
-                --color-canvas-subtle: ${s.mantle} !important;
-                --color-canvas-overlay: ${s.mantle} !important;
-                --color-canvas-inset: ${s.crust} !important;
+                --color-canvas-subtle: ${s.base} !important;
+                --color-canvas-overlay: ${s.base} !important;
+                --color-canvas-inset: ${s.base} !important;
                 --color-fg-default: ${s.text} !important;
                 --color-fg-muted: ${s.subtext0} !important;
                 --color-fg-subtle: ${s.subtext1} !important;
@@ -240,9 +348,9 @@
                 --color-border-muted: ${s.surface0} !important;
                 --color-border-subtle: ${s.surface0} !important;
                 --color-border-accent-emphasis: ${s.accent} !important;
-                --color-neutral-emphasis: ${s.accent} !important;
+                --color-neutral-emphasis: ${s.surface2} !important;
                 --color-neutral-muted: ${s.surface1} !important;
-                --color-neutral-subtle: ${s.surface0} !important;
+                --color-neutral-subtle: ${s.surface1} !important;
                 --color-accent-fg: ${s.accent} !important;
                 --color-accent-muted: ${s.accent}66 !important;
                 --color-accent-subtle: ${s.accent}1a !important;
@@ -254,7 +362,7 @@
                 --color-done-fg: #a855f7 !important;
                 --color-sponsors-fg: #ec4899 !important;
                 --color-btn-text: ${s.text} !important;
-                --color-btn-bg: ${s.surface0} !important;
+                --color-btn-bg: ${s.base} !important;
                 --color-btn-border: ${s.border} !important;
                 --color-btn-hover-bg: ${s.surface1} !important;
                 --color-btn-hover-border: ${s.border} !important;
@@ -267,10 +375,28 @@
                 --color-btn-primary-hover-bg: ${s.accentHover} !important;
                 --color-btn-primary-hover-border: ${s.accentHover} !important;
                 --color-header-text: ${s.text} !important;
-                --color-header-bg: ${s.mantle} !important;
+                --color-header-bg: ${s.base} !important;
                 --color-header-logo: ${s.text} !important;
                 --color-markdown-code-bg: ${s.crust} !important;
                 --color-markdown-table-border: ${s.border} !important;
+
+                /* New Primer tokens used on github.com/home and new nav */
+                --bgColor-default: ${s.base} !important;
+                --bgColor-muted: ${s.base} !important;
+                --bgColor-inset: ${s.base} !important;
+                --bgColor-emphasis: ${s.base} !important;
+                --fgColor-default: ${s.text} !important;
+                --fgColor-muted: ${s.subtext0} !important;
+                --fgColor-onEmphasis: ${s.text} !important;
+                --borderColor-default: ${s.border} !important;
+                --borderColor-muted: ${s.border} !important;
+                --button-default-bgColor-rest: ${s.base} !important;
+                --button-default-fgColor-rest: ${s.text} !important;
+                --button-default-borderColor-rest: ${s.border} !important;
+                --button-default-bgColor-hover: ${s.surface1} !important;
+                --button-primary-bgColor-rest: ${s.accent} !important;
+                --button-primary-fgColor-rest: ${s.crust} !important;
+                --button-primary-bgColor-hover: ${s.accentHover} !important;
             }
             
             ::selection {
@@ -285,10 +411,20 @@
                 background: ${s.base} !important;
                 color: ${s.text} !important;
             }
+
+            main, .application-main, .Layout, .Layout-main, .Layout-sidebar {
+                background: ${s.base} !important;
+                color: ${s.text} !important;
+            }
             
-            header.header {
-                background: ${s.mantle} !important;
+            header.header,
+            header.Header,
+            header.AppHeader,
+            .AppHeader,
+            [data-testid="navbar"] {
+                background: ${s.base} !important;
                 border-color: ${s.border} !important;
+                color: ${s.text} !important;
             }
             
             .header-nav-link {
@@ -296,13 +432,13 @@
             }
             
             .repo-list-item, .Box-row {
-                background: ${s.surface0} !important;
+                background: ${s.base} !important;
                 border-color: ${s.border} !important;
             }
             
-            .repo-title a {
-                color: ${s.accent} !important;
-            }
+            a, a:visited { color: ${s.text} !important; }
+            a:hover { color: ${s.accent} !important; }
+            .repo-title a { color: ${s.text} !important; }
             
             .text-gray-dark, .color-fg-default {
                 color: ${s.text} !important;
@@ -316,68 +452,81 @@
                 background: ${s.accent} !important;
                 color: ${s.crust} !important;
             }
+
+            .btn, .Button, button, [role="button"] {
+                background: ${s.base} !important;
+                color: ${s.text} !important;
+                border-color: ${s.border} !important;
+                box-shadow: none !important;
+            }
+
+            .btn:hover, .Button:hover, button:hover, [role="button"]:hover {
+                background: ${s.surface1} !important;
+            }
+
+            /* Left sidebar / overlays (mobile nav drawer, menus, popovers) */
+            dialog,
+            .Overlay,
+            .Overlay-body,
+            .Overlay-header,
+            .Overlay-footer,
+            .Overlay-backdrop,
+            .Popover,
+            .Popover-message,
+            .SelectMenu,
+            .SelectMenu-modal,
+            .SelectMenu-list,
+            .ActionList,
+            .ActionListWrap,
+            .ActionListContent,
+            .ActionListItem,
+            .ActionList-item {
+                background: ${s.base} !important;
+                color: ${s.text} !important;
+                border-color: ${s.border} !important;
+                box-shadow: none !important;
+            }
+
+            .ActionListItem:hover,
+            .ActionList-item:hover {
+                background: ${s.surface1} !important;
+            }
             
             input, textarea {
-                background: ${s.surface0} !important;
+                background: ${s.base} !important;
                 color: ${s.text} !important;
                 border-color: ${s.border} !important;
             }
-        `;
-    }
 
-    function getRedditCSS(s) {
-        return `
-            :root {
-                --color-tone-1: ${s.text} !important;
-                --color-tone-2: ${s.subtext0} !important;
-                --color-tone-3: ${s.subtext1} !important;
-                --color-tone-4: ${s.overlay0} !important;
-                --color-tone-5: ${s.overlay1} !important;
-                --color-tone-6: ${s.surface2} !important;
-                --color-tone-7: ${s.base} !important;
-                --color-tone-8: ${s.mantle} !important;
-                --color-primary: ${s.accent} !important;
-                --color-primary-hover: ${s.accentHover} !important;
-                --color-upvote: ${s.accent} !important;
-                --color-downvote: #7c3aed !important;
-            }
-            
-            body {
+            /* Home/Dashboard cards + sidebars (best-effort) */
+            .Box,
+            .Box-header,
+            .Box-row,
+            .dashboard-sidebar,
+            .dashboard-main-content,
+            .feed-item-content,
+            [data-testid="dashboard-feed"],
+            [data-testid="dashboard"] {
                 background: ${s.base} !important;
+                border-color: ${s.border} !important;
                 color: ${s.text} !important;
             }
-            
-            #header {
-                background: ${s.mantle} !important;
-            }
-            
-            .thing, .link, .post {
-                background: ${s.surface0} !important;
-            }
-            
-            .title, .title a {
-                color: ${s.accent} !important;
-            }
-            
-            .tagline {
-                color: ${s.subtext0} !important;
-            }
-            
-            .md, .usertext {
+
+            nav,
+            .UnderlineNav,
+            .UnderlineNav-body,
+            .UnderlineNav-item,
+            .TabNav,
+            .tabnav {
+                background: ${s.base} !important;
+                border-color: ${s.border} !important;
                 color: ${s.text} !important;
             }
-            
-            shreddit-post, shreddit-comment {
-                --color-tone-1: ${s.text} !important;
-                --color-tone-7: ${s.base} !important;
-            }
-            
-            ::selection {
-                background-color: ${s.accent}4d !important;
-            }
-            
-            input::placeholder {
-                color: ${s.subtext0} !important;
+
+            .UnderlineNav-item.selected,
+            .UnderlineNav-item[aria-current="page"] {
+                color: ${s.text} !important;
+                border-bottom-color: ${s.accent} !important;
             }
         `;
     }
@@ -396,13 +545,41 @@
             }
             
             [data-testid="primaryColumn"],
+            [data-testid="sidebarColumn"],
             header[role="banner"],
+            div[role="navigation"],
             [data-testid="cellInnerDiv"] {
-                background: transparent !important;
+                background: ${s.base} !important;
+            }
+
+            /* Top "For you / Following" tabs */
+            a[role="tab"],
+            div[role="tablist"] {
+                background: ${s.base} !important;
+                color: ${s.subtext0} !important;
+                border-color: ${s.border} !important;
+            }
+
+            a[role="tab"][aria-selected="true"] {
+                color: ${s.text} !important;
+            }
+
+            a[role="tab"][aria-selected="true"] > div > div {
+                border-bottom-color: ${s.accent} !important;
             }
             
-            [data-testid="tweet"] {
-                background: ${s.surface0} !important;
+            [data-testid="tweet"],
+            article {
+                background: ${s.base} !important;
+                border-color: ${s.border} !important;
+            }
+
+            /* Composer / typing area */
+            [data-testid="tweetTextarea_0"],
+            [data-testid="tweetTextarea_0"] div[role="textbox"],
+            div[role="textbox"][data-testid^="tweetTextarea_"] {
+                background: ${s.base} !important;
+                color: ${s.text} !important;
             }
             
             [data-testid="tweetText"] {
@@ -418,13 +595,130 @@
                 background-color: ${s.accent}4d !important;
             }
             
-            input {
-                background: ${s.surface0} !important;
+            input,
+            textarea {
+                background: ${s.base} !important;
                 color: ${s.text} !important;
+                border-color: ${s.border} !important;
             }
-            
+
             [data-testid="placeholder"] {
                 color: ${s.subtext0} !important;
+            }
+
+            /* Search box */
+            form[role="search"],
+            [data-testid="SearchBox_Search_Input"] {
+                background: ${s.base} !important;
+                color: ${s.text} !important;
+            }
+
+            [data-testid="SearchBox_Search_Input"] {
+                border: 1px solid ${s.border} !important;
+            }
+
+            [data-testid="SearchBox_Search_Input"]::placeholder {
+                color: ${s.subtext0} !important;
+            }
+
+            form[role="search"] svg,
+            [data-testid="SearchBox_Search_Input"] ~ div svg,
+            [data-testid="SearchBox_Search_Input"] + div svg,
+            form[role="search"] [aria-hidden="true"] svg,
+            form[role="search"] svg[viewBox="0 0 24 24"] {
+                color: ${s.subtext0} !important;
+                fill: ${s.subtext0} !important;
+            }
+
+            form[role="search"] svg path {
+                fill: currentColor !important;
+            }
+
+            form[role="search"] svg * {
+                fill: currentColor !important;
+                stroke: currentColor !important;
+            }
+
+            /* Right-side widget cards (Premium/News/Trends/Who to follow) */
+            [data-testid="sidebarColumn"] section,
+            [data-testid="sidebarColumn"] aside,
+            [data-testid="sidebarColumn"] [style*="background-color: rgb(0, 0, 0)"],
+            [data-testid="sidebarColumn"] [style*="background-color: rgba(0, 0, 0"],
+            [aria-label="Timeline: Trending now"],
+            [aria-label="Timeline: Who to follow"],
+            [aria-label="Timeline: Subscribe to Premium"],
+            [aria-label="Timeline: Today’s News"],
+            [aria-label="Timeline: Today's News"],
+            [aria-label="Timeline: What’s happening"],
+            [aria-label="Timeline: What's happening"] {
+                background-color: ${s.base} !important;
+                color: ${s.text} !important;
+                border-color: ${s.border} !important;
+            }
+
+            /* Force any nested AMOLED-black containers inside columns back to theme base */
+            [data-testid="primaryColumn"] [style*="background-color: rgb(0, 0, 0)"],
+            [data-testid="primaryColumn"] [style*="background-color: rgba(0, 0, 0"],
+            [data-testid="sidebarColumn"] [style*="background-color: rgb(0, 0, 0)"],
+            [data-testid="sidebarColumn"] [style*="background-color: rgba(0, 0, 0"],
+            [data-testid="news_sidebar"],
+            [data-testid="news_sidebar"] [style*="background-color: rgb(0, 0, 0)"],
+            [data-testid="news_sidebar"] [style*="background-color: rgba(0, 0, 0"] {
+                background-color: ${s.base} !important;
+                border-color: ${s.border} !important;
+            }
+
+            [data-testid="news_sidebar"] {
+                background: ${s.base} !important;
+                color: ${s.text} !important;
+            }
+
+            [data-testid="news_sidebar"] [role="link"],
+            [data-testid="news_sidebar"] [role="link"] > div,
+            [data-testid^="news_sidebar_article_"],
+            [data-testid^="news_sidebar_article_"] > div {
+                background: ${s.base} !important;
+                color: ${s.text} !important;
+                border-color: ${s.border} !important;
+            }
+
+            [data-testid="news_sidebar"] .r-kemksi {
+                background-color: ${s.base} !important;
+            }
+
+            /* X uses class-based black layers in multiple places */
+            [data-testid="primaryColumn"] .r-kemksi,
+            [data-testid="sidebarColumn"] .r-kemksi,
+            [data-testid="primaryColumn"] .r-oszu61,
+            [data-testid="sidebarColumn"] .r-oszu61 {
+                background-color: ${s.base} !important;
+            }
+
+            /* Sidebar cards (Premium etc) sometimes render as role="region" blocks */
+            [data-testid="sidebarColumn"] section,
+            [data-testid="sidebarColumn"] section[role="region"],
+            [data-testid="sidebarColumn"] div[role="region"] {
+                background: ${s.base} !important;
+                color: ${s.text} !important;
+                border-color: ${s.border} !important;
+                box-shadow: none !important;
+            }
+
+            /* ScrollSnap overlay arrow buttons (inline bg) */
+            [data-testid^="ScrollSnap-"] button[style*="background-color: rgba(15, 20, 25"],
+            [data-testid^="ScrollSnap-"] button[style*="background-color: rgb(15, 20, 25"] {
+                background-color: ${s.base} !important;
+                border-color: ${s.border} !important;
+            }
+
+            a[role="link"][href],
+            a[href] {
+                color: ${s.text} !important;
+            }
+
+            a[role="link"][href]:hover,
+            a[href]:hover {
+                color: ${s.accent} !important;
             }
         `;
     }
@@ -437,8 +731,6 @@
             return getYouTubeCSS(s);
         } else if (hostname.includes('github.com')) {
             return getGitHubCSS(s);
-        } else if (hostname.includes('reddit.com')) {
-            return getRedditCSS(s);
         } else if (hostname.includes('x.com') || hostname.includes('twitter.com')) {
             return getXCSS(s);
         }
@@ -456,7 +748,8 @@
             styleElement = document.createElement('style');
             styleElement.id = 'pywal-themer-style';
             styleElement.type = 'text/css';
-            document.head.appendChild(styleElement);
+            const parent = document.head || document.documentElement;
+            if (parent) parent.appendChild(styleElement);
         }
         
         styleElement.textContent = css;
@@ -474,13 +767,15 @@
                     currentColors = data.colors;
                     const currentHash = data.hash || data.colors[0];
                     
-                    if (currentHash !== lastHash) {
+                    // Always apply at least once per page load; otherwise a reload can get stuck
+                    // with default styles when the hash is unchanged.
+                    if (currentHash !== lastHash || !styleElement) {
                         lastHash = currentHash;
                         try {
                             localStorage.setItem(STORAGE_KEY, lastHash);
                         } catch(e) {}
-                        applyStyles(currentColors);
                     }
+                    applyStyles(currentColors);
                 }
             }
         } catch (e) {

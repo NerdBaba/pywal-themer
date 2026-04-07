@@ -127,6 +127,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let colors_clone = Arc::clone(&colors);
     let cache_path_clone = cache_path.clone();
+    let tokio_handle = tokio::runtime::Handle::current();
 
     let mut watcher = RecommendedWatcher::new(
         move |res: Result<notify::Event, notify::Error>| {
@@ -134,7 +135,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if event.kind.is_modify() {
                     let path = cache_path_clone.clone();
                     let colors = Arc::clone(&colors_clone);
-                    tokio::spawn(async move {
+                    tokio_handle.spawn(async move {
                         let new_colors = load_colors(&path).await;
                         let mut c = colors.lock().await;
                         *c = new_colors;
