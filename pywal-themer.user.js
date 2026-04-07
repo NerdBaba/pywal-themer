@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Pywal Themer
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @description  Theme websites with pywal colors - smart semantic mapping
 // @author       pywal-themer
 // @match        https://*.youtube.com/*
@@ -9,10 +9,7 @@
 // @match        https://*.reddit.com/*
 // @match        https://x.com/*
 // @match        https://twitter.com/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=localhost
-// @grant        GM_xmlhttpRequest
-// @grant        GM_addStyle
-// @grant        GM_registerMenuCommand
+// @grant        none
 // @run-at       document-end
 // ==/UserScript==
 
@@ -45,7 +42,7 @@
         r = Math.min(255, Math.max(0, r + amount));
         g = Math.min(255, Math.max(0, g + amount));
         b = Math.min(255, Math.max(0, b + amount));
-        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        return '#' + r.toString(16).padStart(2, '0') + g.toString(16).padStart(2, '0') + b.toString(16).padStart(2, '0');
     }
 
     function mapPywalToSemantic(colors) {
@@ -88,9 +85,7 @@
         }
     }
 
-    function getYouTubeCSS(colors) {
-        const s = mapPywalToSemantic(colors);
-        
+    function getYouTubeCSS(s) {
         return `
             :root {
                 --yt-spec-base-background: ${s.base} !important;
@@ -163,62 +158,10 @@
                 --yt-spec-call-to-action-fadeoutd: ${s.accent}4d !important;
                 --yt-spec-call-to-action-alpha-30: ${s.accent}4d !important;
                 --yt-spec-themed-blue-alpha-30: ${s.accent}4d !important;
-                --yt-spec-themed-overlay-background: ${s.crust}cc !important;
-                --yt-spec-commerce-badge-background: #4ade80 !important;
-                --yt-spec-static-brand-red: ${s.accent} !important;
-                --yt-spec-static-brand-white: ${s.text} !important;
-                --yt-spec-static-brand-black: ${s.base} !important;
-                --yt-spec-static-clear-color: transparent !important;
-                --yt-spec-static-clear-black: transparent !important;
-                --yt-spec-static-ad-yellow: #fbbf24 !important;
-                --yt-spec-static-grey: ${s.subtext0} !important;
-                --yt-spec-static-overlay-background-solid: ${s.crust} !important;
-                --yt-spec-static-overlay-background-heavy: ${s.surface0} !important;
-                --yt-spec-static-overlay-background-medium: ${s.crust}80 !important;
-                --yt-spec-static-overlay-background-medium-light: ${s.crust}4d !important;
-                --yt-spec-static-overlay-background-light: ${s.crust}1a !important;
-                --yt-spec-static-overlay-text-primary: ${s.text} !important;
-                --yt-spec-static-overlay-text-secondary: ${s.subtext0} !important;
-                --yt-spec-static-overlay-text-disabled: ${s.subtext1} !important;
-                --yt-spec-static-overlay-call-to-action: ${s.accent} !important;
-                --yt-spec-static-overlay-icon-active-other: ${s.text} !important;
-                --yt-spec-static-overlay-icon-inactive: ${s.surface1} !important;
-                --yt-spec-static-overlay-icon-disabled: ${s.surface2} !important;
-                --yt-spec-static-overlay-button-primary: ${s.accent} !important;
-                --yt-spec-static-overlay-button-secondary: ${s.surface0} !important;
-                --yt-spec-static-overlay-touch-response: ${s.overlay1} !important;
-                --yt-spec-static-overlay-touch-response-inverse: ${s.surface1} !important;
-                --yt-spec-static-overlay-background-brand: ${s.accent} !important;
-                --yt-spec-assistive-feed-themed-gradient-1: ${s.subtext0} !important;
-                --yt-spec-assistive-feed-themed-gradient-2: ${s.accent} !important;
-                --yt-spec-assistive-feed-themed-gradient-3: #ff4444 !important;
-                --yt-spec-brand-background-solid: ${s.base} !important;
-                --yt-spec-brand-background-primary: ${s.base} !important;
-                --yt-spec-brand-background-secondary: ${s.mantle} !important;
-                --yt-spec-general-background-a: ${s.base} !important;
-                --yt-spec-general-background-b: ${s.base} !important;
-                --yt-spec-general-background-c: ${s.crust} !important;
-                --yt-spec-error-background: ${s.base} !important;
-                --yt-spec-10-percent-layer: ${s.surface0} !important;
-                --yt-spec-snackbar-background: ${s.mantle} !important;
-                --yt-spec-snackbar-background-updated: ${s.mantle} !important;
-                --yt-spec-badge-chip-background: ${s.surface1} !important;
-                --yt-spec-verified-badge-background: ${s.overlay0} !important;
-                --yt-spec-call-to-action-fadeoutd: ${s.accent}4d !important;
-                --yt-spec-call-to-action-alpha-30: ${s.accent}4d !important;
-                --yt-spec-themed-blue-alpha-30: ${s.accent}4d !important;
-            }
-            
-            html[dark], [dark] {
-                color-scheme: dark;
             }
             
             ::selection {
                 background-color: ${s.accent}4d !important;
-            }
-            
-            input, textarea {
-                color: ${s.text} !important;
             }
             
             input::placeholder, textarea::placeholder {
@@ -227,9 +170,7 @@
         `;
     }
 
-    function getGitHubCSS(colors) {
-        const s = mapPywalToSemantic(colors);
-        
+    function getGitHubCSS(s) {
         return `
             :root {
                 --color-canvas-default: ${s.base} !important;
@@ -318,7 +259,6 @@
                 --color-btn-primary-disabled-text: ${s.crust}80 !important;
                 --color-btn-primary-disabled-bg: ${s.accent}80 !important;
                 --color-btn-primary-disabled-border: ${s.accent}80 !important;
-                --color-btn-primary-icon: ${s.crust} !important;
                 --color-btn-primary-counter-bg: ${s.crust}33 !important;
                 
                 --color-header-text: ${s.text} !important;
@@ -362,10 +302,6 @@
                 --color-prettylights-syntax-constant-other-reference-link: #4ade80 !important;
             }
             
-            html {
-                color-scheme: ${isLight(s.base) ? 'light' : 'dark'};
-            }
-            
             ::selection {
                 background-color: ${s.accent}4d !important;
             }
@@ -376,9 +312,7 @@
         `;
     }
 
-    function getRedditCSS(colors) {
-        const s = mapPywalToSemantic(colors);
-        
+    function getRedditCSS(s) {
         return `
             :root {
                 --color-tone-1: ${s.text} !important;
@@ -442,9 +376,7 @@
         `;
     }
 
-    function getXCSS(colors) {
-        const s = mapPywalToSemantic(colors);
-        
+    function getXCSS(s) {
         return `
             :root {
                 --theme-color: ${s.accent};
@@ -524,16 +456,17 @@
     }
 
     function getCurrentPageCSS(colors) {
+        const s = mapPywalToSemantic(colors);
         const hostname = window.location.hostname;
         
         if (hostname.includes('youtube.com')) {
-            return getYouTubeCSS(colors);
+            return getYouTubeCSS(s);
         } else if (hostname.includes('github.com')) {
-            return getGitHubCSS(colors);
+            return getGitHubCSS(s);
         } else if (hostname.includes('reddit.com')) {
-            return getRedditCSS(colors);
+            return getRedditCSS(s);
         } else if (hostname.includes('x.com') || hostname.includes('twitter.com')) {
-            return getXCSS(colors);
+            return getXCSS(s);
         }
         
         return '';
@@ -554,34 +487,24 @@
         styleElement.textContent = css;
     }
 
-    function fetchColors() {
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: SERVER_URL,
-            timeout: 3000,
-            onload: function(response) {
-                if (response.status === 200) {
+    async function fetchColors() {
+        try {
+            const response = await fetch(SERVER_URL, { signal: AbortSignal.timeout(3000) });
+            if (response.ok) {
+                const data = await response.json();
+                const currentHash = data.hash || (data.colors && data.colors[0]) || '';
+                
+                if (currentHash !== lastHash && data.colors) {
+                    lastHash = currentHash;
                     try {
-                        const data = JSON.parse(response.responseText);
-                        const currentHash = data.hash || data.colors?.[0] || '';
-                        
-                        if (currentHash !== lastHash && data.colors) {
-                            lastHash = currentHash;
-                            localStorage.setItem(STORAGE_KEY, lastHash);
-                            applyStyles(data.colors);
-                        }
-                    } catch (e) {
-                        console.error('Pywal Themer: JSON parse error', e);
-                    }
+                        localStorage.setItem(STORAGE_KEY, lastHash);
+                    } catch(e) {}
+                    applyStyles(data.colors);
                 }
-            },
-            onerror: function() {
-                console.warn('Pywal Themer: Server not reachable');
-            },
-            ontimeout: function() {
-                console.warn('Pywal Themer: Request timeout');
             }
-        });
+        } catch (e) {
+            // Server not reachable, silently ignore
+        }
     }
 
     function init() {
