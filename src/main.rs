@@ -37,7 +37,24 @@ fn parse_pywal_colors(content: &str) -> PywalColors {
     let lines: Vec<&str> = content.lines().collect();
     let mut colors: Vec<String> = Vec::new();
 
-    for line in lines.iter().take(16) {
+    // Pywal format: first line is hash (#hash), then 16 hex colors
+    // Sometimes hash is omitted
+    let mut hash = String::new();
+    let mut start_idx = 0;
+    
+    // Check if first line looks like a hash (#hash...)
+    if let Some(first) = lines.first() {
+        if first.trim().starts_with('#') && first.len() > 7 {
+            // Looks like hash followed by colors on same line or next lines
+            if first.len() > 8 {
+                // Hash is on its own line like "#abc123"
+                hash = first.trim().to_string();
+                start_idx = 1;
+            }
+        }
+    }
+
+    for line in lines.iter().skip(start_idx).take(16) {
         let trimmed = line.trim();
         if trimmed.starts_with('#') && trimmed.len() >= 7 {
             colors.push(trimmed[..7].to_string());
@@ -48,16 +65,16 @@ fn parse_pywal_colors(content: &str) -> PywalColors {
         colors.push("#1a1a2e".to_string());
     }
 
+    // Try to find wallpaper (path starts with /)
     let wallpaper = lines
         .iter()
-        .find(|l| l.starts_with('/'))
+        .find(|l| l.trim().starts_with('/'))
         .map(|s| s.trim().to_string());
 
-    let hash = if let Some(l) = lines.iter().find(|l| l.starts_with('#')) {
-        l.trim().to_string()
-    } else {
-        String::new()
-    };
+    // If no hash found, use first color as hash
+    if hash.is_empty() && !colors.is_empty() {
+        hash = colors[0].clone();
+    }
 
     PywalColors {
         colors,
