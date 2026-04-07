@@ -491,6 +491,57 @@
             .ActionList-item:hover {
                 background: ${s.surface1} !important;
             }
+
+            /* New "prc-" dialog/sidebar components */
+            [class*="prc-Dialog-Dialog"],
+            [class*="prc-Dialog-DialogOverflowWrapper"],
+            [class*="prc-ScrollableRegion-ScrollableRegion"],
+            [class*="prc-Stack-Stack"] {
+                background: ${s.base} !important;
+                color: ${s.text} !important;
+                border-color: ${s.border} !important;
+                box-shadow: none !important;
+            }
+
+            [class*="prc-ActionList-ActionList"],
+            [class*="prc-ActionList-ActionListItem"],
+            [class*="prc-ActionList-ActionListContent"],
+            [class*="prc-ActionList-GroupHeading"],
+            [class*="prc-ActionList-ItemLabel"],
+            [class*="prc-NavList-GroupHeading"] {
+                background: ${s.base} !important;
+                color: ${s.text} !important;
+                border-color: ${s.border} !important;
+            }
+
+            [class*="prc-ActionList-ActionListItem"][data-active="true"],
+            [class*="prc-ActionList-ActionListItem"][aria-current="page"] {
+                background: ${s.surface1} !important;
+            }
+
+            [class*="prc-ActionList-ActionListItem"]:hover,
+            [class*="prc-ActionList-ActionListContent"]:hover {
+                background: ${s.surface1} !important;
+            }
+
+            [class*="prc-Link-Link"] {
+                color: ${s.text} !important;
+            }
+
+            [class*="prc-Link-Link"]:hover {
+                color: ${s.accent} !important;
+            }
+
+            [data-component="IconButton"] {
+                background: transparent !important;
+                color: ${s.text} !important;
+                border-color: ${s.border} !important;
+                box-shadow: none !important;
+            }
+
+            [data-component="IconButton"]:hover {
+                background: ${s.surface1} !important;
+            }
             
             input, textarea {
                 background: ${s.base} !important;
