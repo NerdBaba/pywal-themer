@@ -50,10 +50,11 @@ pywal (daemon) → writes to ~/.cache/wal/colors → server reads → serves JSO
 // @version      1.0
 // @description  Theme websites with pywal colors
 // @match        https://*.youtube.com/*
-// @match        https://*.github.com/*
+// @match        https://github.com/*
 // @match        https://*.reddit.com/*
 // @match        https://x.com/*
 // @match        https://twitter.com/*
+// @match        https://*.learncpp.com/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_addStyle
 // @run-at       document-end
@@ -106,9 +107,20 @@ pywal (daemon) → writes to ~/.cache/wal/colors → server reads → serves JSO
 - Tweets: `[data-testid="tweet"]`
 - Text: use `data-testid` selectors
 
+### LearnCpp Theming
+- Background: `body`, `#site-wrapper`, `#content`, `main`
+- Header: `#masthead`, `#site-header-main`, `#branding`
+- Navigation: `#access`, `#mobile-menu`, `#prime_nav`
+- Content: `.entry-content`, `article`, `.article-inner`
+- Code blocks: `.code-block`, `pre`, `code`
+- Notes/Sections: `.cpp-note`, `.cpp-section`
+- Navigation buttons: `.nav-button`
+- Sidebar: `#primary`, `#secondary`, `.widget-area`
+- Footer: `#colophon`, `#footer`
+
 ## Acceptance Criteria
 1. Server starts in <100ms, uses <5MB RAM
-2. Userscript loads on all 4 sites
+2. Userscript loads on all supported sites (YouTube, GitHub, X, learncpp.com)
 3. Colors update within 5 seconds of pywal change
 4. No memory leaks in userscript (cleanup on navigation)
 5. Graceful handling when server is down

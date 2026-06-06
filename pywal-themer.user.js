@@ -8,91 +8,134 @@
 // @match        https://github.com/*
 // @match        https://x.com/*
 // @match        https://twitter.com/*
+// @match        https://www.learncpp.com/*
+// @match        https://learncpp.com/*
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
 
-(function() {
-    'use strict';
+(function () {
+  "use strict";
 
-    const SERVER_URL = 'http://127.0.0.1:7890/colors';
-    const POLL_INTERVAL = 5000;
-    const STORAGE_KEY = 'pywal_themer_hash';
+  const SERVER_URL = "http://127.0.0.1:7890/colors";
+  const POLL_INTERVAL = 5000;
+  const STORAGE_KEY = "pywal_themer_hash";
 
-    let lastHash = '';
-    let styleElement = null;
-    let pollTimer = null;
-    let currentColors = null;
+  let lastHash = "";
+  let styleElement = null;
+  let pollTimer = null;
+  let currentColors = null;
 
-    function luminance(hex) {
-        const r = parseInt(hex.slice(1, 3), 16) / 255;
-        const g = parseInt(hex.slice(3, 5), 16) / 255;
-        const b = parseInt(hex.slice(5, 7), 16) / 255;
-        return 0.299 * r + 0.587 * g + 0.114 * b;
+  function luminance(hex) {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    return 0.299 * r + 0.587 * g + 0.114 * b;
+  }
+
+  function isLight(hex) {
+    return luminance(hex) > 0.5;
+  }
+
+  function adjustColor(hex, amount) {
+    if (!hex || hex.length < 7) return "#1a1a2e";
+    let r = parseInt(hex.slice(1, 3), 16);
+    let g = parseInt(hex.slice(3, 5), 16);
+    let b = parseInt(hex.slice(5, 7), 16);
+    r = Math.min(255, Math.max(0, r + amount));
+    g = Math.min(255, Math.max(0, g + amount));
+    b = Math.min(255, Math.max(0, b + amount));
+    return (
+      "#" +
+      r.toString(16).padStart(2, "0") +
+      g.toString(16).padStart(2, "0") +
+      b.toString(16).padStart(2, "0")
+    );
+  }
+
+  function getDefaultColors() {
+    // Default dark theme colors matching pywal format (16 colors)
+    return [
+      "#160c09",
+      "#a48d7d",
+      "#979fae",
+      "#c39b82",
+      "#b7a99e",
+      "#dcab8c",
+      "#bfc1b5",
+      "#c4c2c1",
+      "#6c5e59",
+      "#a48d7d",
+      "#979fae",
+      "#c39b82",
+      "#b7a99e",
+      "#dcab8c",
+      "#bfc1b5",
+      "#c4c2c1",
+    ];
+  }
+
+  function mapPywalToSemantic(colors) {
+    colors = colors || getDefaultColors();
+    const isDark = colors[0] && !isLight(colors[0]);
+
+    // Ensure we have all 16 colors, pad if needed
+    while (colors.length < 16) {
+      colors.push(colors[0] || "#1a1a2e");
     }
 
-    function isLight(hex) {
-        return luminance(hex) > 0.5;
+    if (isDark) {
+      return {
+        base: colors[0] || "#160c09",
+        mantle: colors[1] || "#a48d7d",
+        crust: colors[2] || "#979fae",
+        surface0: adjustColor(colors[0] || "#160c09", 15),
+        surface1: adjustColor(colors[0] || "#160c09", 25),
+        surface2: adjustColor(colors[0] || "#160c09", 35),
+        overlay0: colors[8] || "#6c5e59",
+        overlay1: colors[9] || "#a48d7d",
+        // Syntax colors from pywal palette
+        syntaxRed: colors[1] || "#a48d7d", // includes, errors
+        syntaxGreen: colors[2] || "#979fae", // strings, comments
+        syntaxYellow: colors[3] || "#c39b82", // warnings, types
+        syntaxBlue: colors[4] || "#b7a99e", // keywords, functions
+        syntaxMagenta: colors[5] || "#dcab8c", // special
+        syntaxCyan: colors[6] || "#bfc1b5", // numbers, operators
+        text: colors[15] || colors[7] || "#c4c2c1",
+        subtext0: adjustColor(colors[15] || colors[7] || "#c4c2c1", -30),
+        subtext1: adjustColor(colors[15] || colors[7] || "#c4c2c1", -50),
+        accent: colors[5] || "#dcab8c", // warm accent for links/buttons
+        accentHover: adjustColor(colors[5] || "#dcab8c", 30),
+        border: adjustColor(colors[0] || "#160c09", 35),
+      };
+    } else {
+      return {
+        base: colors[0] || "#f5f5f5",
+        mantle: colors[1] || "#a48d7d",
+        crust: colors[2] || "#979fae",
+        surface0: adjustColor(colors[0] || "#f5f5f5", -10),
+        surface1: adjustColor(colors[0] || "#f5f5f5", -5),
+        surface2: adjustColor(colors[0] || "#f5f5f5", -15),
+        overlay0: colors[8] || "#6c5e59",
+        overlay1: colors[9] || "#a48d7d",
+        syntaxRed: colors[1] || "#a48d7d",
+        syntaxGreen: colors[2] || "#979fae",
+        syntaxYellow: colors[3] || "#c39b82",
+        syntaxBlue: colors[4] || "#b7a99e",
+        syntaxMagenta: colors[5] || "#dcab8c",
+        syntaxCyan: colors[6] || "#bfc1b5",
+        text: colors[0] || "#160c09",
+        subtext0: adjustColor(colors[7] || "#c4c2c1", -30),
+        subtext1: adjustColor(colors[7] || "#c4c2c1", -50),
+        accent: colors[4] || "#b7a99e",
+        accentHover: adjustColor(colors[5] || "#dcab8c", -20),
+        border: adjustColor(colors[0] || "#f5f5f5", -30),
+      };
     }
+  }
 
-    function adjustColor(hex, amount) {
-        if (!hex || hex.length < 7) return '#1a1a2e';
-        let r = parseInt(hex.slice(1, 3), 16);
-        let g = parseInt(hex.slice(3, 5), 16);
-        let b = parseInt(hex.slice(5, 7), 16);
-        r = Math.min(255, Math.max(0, r + amount));
-        g = Math.min(255, Math.max(0, g + amount));
-        b = Math.min(255, Math.max(0, b + amount));
-        return '#' + r.toString(16).padStart(2, '0') + g.toString(16).padStart(2, '0') + b.toString(16).padStart(2, '0');
-    }
-
-    function getDefaultColors() {
-        return ['#1a1a2e', '#16213e', '#0f3460', '#e94560', '#f5f5f5', '#aaaaaa', '#333333', '#222222'];
-    }
-
-    function mapPywalToSemantic(colors) {
-        colors = colors || getDefaultColors();
-        const isDark = colors[0] && !isLight(colors[0]);
-        
-        if (isDark) {
-            return {
-                base: colors[0] || '#1a1a2e',
-                mantle: colors[1] || '#16213e',
-                crust: colors[2] || '#0f3460',
-                surface0: colors[7] || '#222222',
-                surface1: adjustColor(colors[0] || '#1a1a2e', 15),
-                surface2: adjustColor(colors[0] || '#1a1a2e', 30),
-                overlay0: adjustColor(colors[0] || '#1a1a2e', 45),
-                overlay1: adjustColor(colors[0] || '#1a1a2e', 60),
-                subtext0: colors[5] || '#aaaaaa',
-                subtext1: adjustColor(colors[5] || '#aaaaaa', 20),
-                text: colors[4] || '#f5f5f5',
-                accent: colors[3] || '#e94560',
-                accentHover: adjustColor(colors[3] || '#e94560', 20),
-                border: adjustColor(colors[0] || '#1a1a2e', 25),
-            };
-        } else {
-            return {
-                base: colors[0] || '#f5f5f5',
-                mantle: adjustColor(colors[0] || '#f5f5f5', -10),
-                crust: adjustColor(colors[0] || '#f5f5f5', -20),
-                surface0: adjustColor(colors[0] || '#f5f5f5', 10),
-                surface1: adjustColor(colors[0] || '#f5f5f5', 20),
-                surface2: adjustColor(colors[0] || '#f5f5f5', 30),
-                overlay0: adjustColor(colors[0] || '#f5f5f5', 40),
-                overlay1: adjustColor(colors[0] || '#f5f5f5', 50),
-                subtext0: colors[5] || '#666666',
-                subtext1: adjustColor(colors[5] || '#666666', -20),
-                text: colors[4] || '#1a1a2e',
-                accent: colors[3] || '#e94560',
-                accentHover: adjustColor(colors[3] || '#e94560', -15),
-                border: adjustColor(colors[0] || '#f5f5f5', -15),
-            };
-        }
-    }
-
-    function getYouTubeCSS(s) {
-        return `
+  function getYouTubeCSS(s) {
+    return `
             :root {
                 --yt-spec-base-background: ${s.base} !important;
                 --yt-spec-raised-background: ${s.base} !important;
@@ -165,20 +208,20 @@
                 --yt-spec-call-to-action-alpha-30: ${s.accent}4d !important;
                 --yt-spec-themed-blue-alpha-30: ${s.accent}4d !important;
             }
-            
+
             ::selection {
                 background-color: ${s.accent}4d !important;
             }
-            
+
             input::placeholder, textarea::placeholder {
                 color: ${s.subtext0} !important;
             }
-            
+
             ytd-app, html, body {
                 background: ${s.base} !important;
                 color: ${s.text} !important;
             }
-            
+
             ytd-masthead#masthead, #masthead {
                 background: ${s.base} !important;
             }
@@ -190,20 +233,20 @@
                 background: ${s.base} !important;
                 color: ${s.text} !important;
             }
-            
+
             #video-title, #video-title-link {
                 color: ${s.text} !important;
             }
-            
+
             #channel-name {
                 color: ${s.subtext0} !important;
             }
-            
+
             ytd-thumbnail-overlay-time-status-renderer {
                 background: ${s.crust} !important;
                 color: ${s.text} !important;
             }
-            
+
             ytd-button-renderer yt-button-shape button {
                 background: ${s.surface1} !important;
                 color: ${s.text} !important;
@@ -214,13 +257,13 @@
             ytd-button-renderer yt-button-shape button:hover {
                 background: ${s.surface0} !important;
             }
-            
+
             ytd-searchbox {
                 background: ${s.base} !important;
                 border: 1px solid ${s.border} !important;
                 box-shadow: none !important;
             }
-            
+
             ytd-searchbox input {
                 color: ${s.text} !important;
                 background: transparent !important;
@@ -269,7 +312,7 @@
             yt-icon-button:hover {
                 background: ${s.surface1} !important;
             }
-            
+
             ytd-rich-item-renderer,
             ytd-rich-grid-media,
             ytd-video-renderer,
@@ -322,10 +365,10 @@
                 background: ${s.surface0} !important;
             }
         `;
-    }
+  }
 
-    function getGitHubCSS(s) {
-        return `
+  function getGitHubCSS(s) {
+    return `
             :root {
                 --color-canvas-default: ${s.base} !important;
                 --color-canvas-subtle: ${s.base} !important;
@@ -398,15 +441,15 @@
                 --button-primary-fgColor-rest: ${s.crust} !important;
                 --button-primary-bgColor-hover: ${s.accentHover} !important;
             }
-            
+
             ::selection {
                 background-color: ${s.accent}4d !important;
             }
-            
+
             input::placeholder, textarea::placeholder {
                 color: ${s.subtext0} !important;
             }
-            
+
             body, .app-content {
                 background: ${s.base} !important;
                 color: ${s.text} !important;
@@ -416,7 +459,7 @@
                 background: ${s.base} !important;
                 color: ${s.text} !important;
             }
-            
+
             header.header,
             header.Header,
             header.AppHeader,
@@ -426,28 +469,28 @@
                 border-color: ${s.border} !important;
                 color: ${s.text} !important;
             }
-            
+
             .header-nav-link {
                 color: ${s.text} !important;
             }
-            
+
             .repo-list-item, .Box-row {
                 background: ${s.base} !important;
                 border-color: ${s.border} !important;
             }
-            
+
             a, a:visited { color: ${s.text} !important; }
             a:hover { color: ${s.accent} !important; }
             .repo-title a { color: ${s.text} !important; }
-            
+
             .text-gray-dark, .color-fg-default {
                 color: ${s.text} !important;
             }
-            
+
             .color-fg-muted {
                 color: ${s.subtext0} !important;
             }
-            
+
             .btn-primary {
                 background: ${s.accent} !important;
                 color: ${s.crust} !important;
@@ -542,7 +585,7 @@
             [data-component="IconButton"]:hover {
                 background: ${s.surface1} !important;
             }
-            
+
             input, textarea {
                 background: ${s.base} !important;
                 color: ${s.text} !important;
@@ -580,21 +623,21 @@
                 border-bottom-color: ${s.accent} !important;
             }
         `;
-    }
+  }
 
-    function getXCSS(s) {
-        return `
+  function getXCSS(s) {
+    return `
             :root {
                 --theme-color: ${s.accent};
                 --theme-bg-dim: ${s.base}99;
                 --theme-popup: ${s.mantle}cc;
             }
-            
+
             body {
                 background-color: ${s.base} !important;
                 color: ${s.text} !important;
             }
-            
+
             [data-testid="primaryColumn"],
             [data-testid="sidebarColumn"],
             header[role="banner"],
@@ -618,7 +661,7 @@
             a[role="tab"][aria-selected="true"] > div > div {
                 border-bottom-color: ${s.accent} !important;
             }
-            
+
             [data-testid="tweet"],
             article {
                 background: ${s.base} !important;
@@ -632,20 +675,20 @@
                 background: ${s.base} !important;
                 color: ${s.text} !important;
             }
-            
+
             [data-testid="tweetText"] {
                 color: ${s.text} !important;
             }
-            
+
             button[style*="rgb(29, 155, 240)"],
             [aria-label="Post"] {
                 background: ${s.accent} !important;
             }
-            
+
             ::selection {
                 background-color: ${s.accent}4d !important;
             }
-            
+
             input,
             textarea {
                 background: ${s.base} !important;
@@ -772,96 +815,415 @@
                 color: ${s.accent} !important;
             }
         `;
-    }
+  }
 
-    function getCurrentPageCSS(colors) {
-        const s = mapPywalToSemantic(colors);
-        const hostname = window.location.hostname;
-        
-        if (hostname.includes('youtube.com')) {
-            return getYouTubeCSS(s);
-        } else if (hostname.includes('github.com')) {
-            return getGitHubCSS(s);
-        } else if (hostname.includes('x.com') || hostname.includes('twitter.com')) {
-            return getXCSS(s);
-        }
-        
-        return '';
-    }
-
-    function applyStyles(colors) {
-        colors = colors || getDefaultColors();
-        const css = getCurrentPageCSS(colors);
-        
-        if (!css) return;
-        
-        if (!styleElement) {
-            styleElement = document.createElement('style');
-            styleElement.id = 'pywal-themer-style';
-            styleElement.type = 'text/css';
-            const parent = document.head || document.documentElement;
-            if (parent) parent.appendChild(styleElement);
-        }
-        
-        styleElement.textContent = css;
-    }
-
-    async function fetchColors() {
-        try {
-            const response = await fetch(SERVER_URL, { 
-                signal: AbortSignal.timeout(3000),
-                mode: 'cors'
-            });
-            if (response.ok) {
-                const data = await response.json();
-                if (data.colors && data.colors.length > 0) {
-                    currentColors = data.colors;
-                    const currentHash = data.hash || data.colors[0];
-                    
-                    // Always apply at least once per page load; otherwise a reload can get stuck
-                    // with default styles when the hash is unchanged.
-                    if (currentHash !== lastHash || !styleElement) {
-                        lastHash = currentHash;
-                        try {
-                            localStorage.setItem(STORAGE_KEY, lastHash);
-                        } catch(e) {}
-                    }
-                    applyStyles(currentColors);
-                }
+  function getLearncppCSS(s) {
+    return `
+            body {
+                color: ${s.text} !important;
+                background-color: ${s.base} !important;
+                font-family: 'Inconsolata', 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', Consolas, monospace !important;
             }
-        } catch (e) {
-            // Server not reachable - keep using current colors or defaults
-            if (currentColors) {
-                applyStyles(currentColors);
-            } else {
-                applyStyles(getDefaultColors());
+
+            #site-header-main {
+                background: ${s.base} !important;
             }
-        }
+
+            #site-description {
+                color: ${s.subtext0} !important;
+            }
+
+            #primary,
+            #secondary {
+                background-color: ${s.base} !important;
+            }
+
+            .lp-staticslider::before,
+            .lp-dynamic-slider .item > a::before,
+            #header-image-main::before {
+                background-color: ${s.base} !important;
+            }
+
+            #access > div > ul > li,
+            #access > div > ul > li > a,
+            .septera-over-menu .header-fixed#site-header-main #access > div > ul > li:not([class*="current"]),
+            .septera-over-menu .header-fixed#site-header-main #access > div > ul > li:not([class*="current"]) > a,
+            .septera-over-menu .header-fixed#site-header-main #sheader.socials a::before,
+            #sheader.socials a::before,
+            #mobile-menu {
+                color: ${s.subtext0} !important;
+            }
+
+            body:not(.septera-landing-page) .main,
+            #lp-posts,
+            #lp-page,
+            .searchform {
+                background-color: ${s.surface0} !important;
+            }
+
+            .entry-content h1,
+            .entry-content h2,
+            .entry-content h3,
+            .entry-content h4,
+            .lp-text-content h1,
+            .lp-text-content h2,
+            .lp-text-content h3,
+            .lp-text-content h4,
+            .entry-title {
+                color: ${s.text} !important;
+            }
+
+            .entry-meta span,
+            .entry-meta a,
+            .entry-utility span,
+            .entry-utility a,
+            .entry-meta time,
+            #breadcrumbs-nav,
+            .footermenu ul li span.sep {
+                color: ${s.subtext0} !important;
+            }
+
+            code[class*="language-"],
+            pre[class*="language-"] {
+                background: ${s.surface1} !important;
+                color: ${s.text} !important;
+            }
+
+            .token.directive.keyword {
+                color: ${s.syntaxYellow} !important;
+            }
+
+            .token.keyword {
+                color: ${s.syntaxBlue} !important;
+            }
+
+            .token.function {
+                color: ${s.syntaxMagenta} !important;
+            }
+
+            .token.comment {
+                color: ${s.syntaxGreen} !important;
+            }
+
+            .token.keyword.keyword-break,
+            .token.keyword.keyword-case,
+            .token.keyword.keyword-catch,
+            .token.keyword.keyword-continue,
+            .token.keyword.keyword-do,
+            .token.keyword.keyword-else,
+            .token.keyword.keyword-for,
+            .token.keyword.keyword-goto,
+            .token.keyword.keyword-if,
+            .token.keyword.keyword-return,
+            .token.keyword.keyword-switch,
+            .token.keyword.keyword-throw,
+            .token.keyword.keyword-try,
+            .token.keyword.keyword-while {
+                color: ${s.syntaxMagenta} !important;
+            }
+
+            .token.punctuation {
+                color: ${s.text} !important;
+            }
+
+            .token.string {
+                color: ${s.syntaxGreen} !important;
+            }
+
+            .token.number {
+                color: ${s.syntaxCyan} !important;
+            }
+
+            .cpp-lightyellowbackground {
+                background-color: ${s.surface0} !important;
+                border: 2px solid ${s.syntaxYellow} !important;
+                box-shadow: 0 2px ${s.border} !important;
+            }
+
+            .cpp-lightgreenbackground {
+                background-color: ${s.surface0} !important;
+                border: 2px solid ${s.syntaxGreen} !important;
+                box-shadow: 0 2px ${s.border} !important;
+            }
+
+            .cpp-lightgraybackground {
+                background-color: ${s.surface0} !important;
+                border: 2px solid ${s.border} !important;
+                box-shadow: 0 2px ${s.base} !important;
+            }
+
+            .cpp-lightredbackground {
+                background-color: ${s.surface0} !important;
+                border: 2px solid ${s.syntaxRed} !important;
+                box-shadow: 0 2px ${s.border} !important;
+            }
+
+            #main pre[class*="language-"] {
+                background-color: ${s.surface1} !important;
+                background-image: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.08) 50%) !important;
+                background-size: 100% 3rem !important;
+            }
+
+            .cpp-lightbluebackground {
+                background-color: ${s.surface0} !important;
+                border: 2px solid ${s.syntaxBlue} !important;
+                box-shadow: 0 2px ${s.border} !important;
+            }
+
+            :not(pre) > code {
+                background-color: ${s.surface1} !important;
+                color: ${s.text} !important;
+                padding: 1px 4px !important;
+                border-radius: 4px !important;
+                box-shadow: 0 1px ${s.border} !important;
+            }
+
+            pre,
+            .page-link > span,
+            .comment-author,
+            .commentlist .comment-body,
+            .commentlist .pingback {
+                border-color: ${s.border} !important;
+            }
+
+            blockquote {
+                border: 1px solid ${s.surface2} !important;
+            }
+
+            .entry-content blockquote::before,
+            .entry-content blockquote::after {
+                color: ${s.syntaxGreen} !important;
+            }
+
+            #wpdcom .wpd-form .wpdiscuz-textarea-wrap.wpd-txt .quicktags-toolbar .ed_button {
+                background: ${s.surface1} !important;
+                color: ${s.text} !important;
+            }
+
+            input[type]:hover,
+            textarea:hover,
+            select:hover,
+            input[type]:focus,
+            textarea:focus,
+            select:focus {
+                background: ${s.surface0} !important;
+            }
+
+            #comments {
+                color: ${s.text} !important;
+            }
+
+            #wpdcom .wpd-comment-text {
+                color: ${s.text} !important;
+            }
+
+            #wpdcom .wpd-blog-guest .wpd-comment-author,
+            #wpdcom .wpd-blog-guest .wpd-comment-author a {
+                color: ${s.accent} !important;
+            }
+
+            #wpdcom.wpd-layout-2 .wpd-comment.wpd-reply .wpd-comment-wrap {
+                background-color: ${s.surface0} !important;
+                border-left: 3px solid ${s.accent} !important;
+                padding: 10px 15px 0 17px !important;
+            }
+
+            #wpdcom .wpd-comment .wpd-reply-to a {
+                color: ${s.accent} !important;
+            }
+
+            #wpdcom .wpd-comment-header {
+                color: ${s.subtext0} !important;
+            }
+
+            #wpdcom .wpd-form .wpdiscuz-textarea-wrap textarea {
+                border: 1px solid ${s.border} !important;
+                background-color: ${s.surface1} !important;
+                color: ${s.text} !important;
+            }
+
+            #wpdcom .wpd-form-row .wpdiscuz-item {
+                background-color: ${s.base} !important;
+            }
+
+            #wpdcom .wpd-form-row .wpd-field {
+                color: ${s.text} !important;
+                border-color: ${s.border} !important;
+                background-color: ${s.surface1} !important;
+            }
+
+            #wpdcom .wpd-form-row .wpdiscuz-item input[type="text"],
+            #wpdcom .wpd-form-row .wpdiscuz-item input[type="email"],
+            #wpdcom textarea,
+            #wpdcom select {
+                border-color: ${s.border} !important;
+                background-color: ${s.surface1} !important;
+                color: ${s.text} !important;
+            }
+
+            .changetable-widget-row {
+                background-color: ${s.surface0} !important;
+                font-size: 10px !important;
+            }
+
+            .changetable-widget-group-2 {
+                padding: 0 8px !important;
+                text-decoration: none !important;
+                color: ${s.text} !important;
+            }
+
+            .lessontable-header-title {
+                color: ${s.text} !important;
+            }
+
+            .lessontable-header-chapter,
+            .lessontable-row-number {
+                background-color: ${s.surface1} !important;
+                color: ${s.text} !important;
+            }
+
+            .lessontable-row-title {
+                color: ${s.text} !important;
+            }
+
+            .lessontable-row:nth-child(2n+1),
+            .changetable-row:nth-child(2n+1) {
+                background-color: ${s.surface0} !important;
+            }
+
+            .lessontable-row,
+            .chaptertable-row,
+            .changetable-row {
+                background-color: ${s.surface0} !important;
+            }
+
+            a:link {
+                color: ${s.accent} !important;
+            }
+
+            a:visited {
+                color: ${s.syntaxBlue} !important;
+            }
+
+            .lessontable,
+            .changetable {
+                box-shadow: 0 2px 12px ${s.border} !important;
+            }
+
+            .lessontable-row-title a:visited,
+            .chaptertable-row-title {
+                color: ${s.text} !important;
+            }
+
+            .lessontable-row:hover {
+                background-color: ${s.surface1} !important;
+            }
+
+            #colophon,
+            #footer {
+                background-color: ${s.mantle} !important;
+                color: ${s.text} !important;
+            }
+
+            td {
+                background-color: ${s.surface0} !important;
+            }
+
+            #main .cpp-table tr:nth-child(2n+1) td {
+                background-color: ${s.surface1} !important;
+            }
+        `;
+  }
+
+  function getCurrentPageCSS(colors) {
+    const s = mapPywalToSemantic(colors);
+    const hostname = window.location.hostname;
+
+    if (hostname.includes("youtube.com")) {
+      return getYouTubeCSS(s);
+    } else if (hostname.includes("github.com")) {
+      return getGitHubCSS(s);
+    } else if (hostname.includes("x.com") || hostname.includes("twitter.com")) {
+      return getXCSS(s);
+    } else if (hostname.includes("learncpp.com")) {
+      return getLearncppCSS(s);
     }
 
-    function init() {
-        // Try localStorage for last known hash
-        try {
-            lastHash = localStorage.getItem(STORAGE_KEY) || '';
-        } catch(e) {}
-        
-        // Apply default styles immediately to avoid flash
+    return "";
+  }
+
+  function applyStyles(colors) {
+    colors = colors || getDefaultColors();
+    const css = getCurrentPageCSS(colors);
+
+    if (!css) return;
+
+    if (!styleElement) {
+      styleElement = document.createElement("style");
+      styleElement.id = "pywal-themer-style";
+      styleElement.type = "text/css";
+      const parent = document.head || document.documentElement;
+      if (parent) parent.appendChild(styleElement);
+    }
+
+    styleElement.textContent = css;
+  }
+
+  async function fetchColors() {
+    try {
+      const response = await fetch(SERVER_URL, {
+        signal: AbortSignal.timeout(3000),
+        mode: "cors",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.colors && data.colors.length > 0) {
+          currentColors = data.colors;
+          const currentHash = data.hash || data.colors[0];
+
+          // Always apply at least once per page load; otherwise a reload can get stuck
+          // with default styles when the hash is unchanged.
+          if (currentHash !== lastHash || !styleElement) {
+            lastHash = currentHash;
+            try {
+              localStorage.setItem(STORAGE_KEY, lastHash);
+            } catch (e) {}
+          }
+          applyStyles(currentColors);
+        }
+      }
+    } catch (e) {
+      // Server not reachable - keep using current colors or defaults
+      if (currentColors) {
+        applyStyles(currentColors);
+      } else {
         applyStyles(getDefaultColors());
-        
-        // Then try to fetch fresh colors
-        fetchColors();
-        
-        // Poll for updates
-        pollTimer = setInterval(fetchColors, POLL_INTERVAL);
+      }
     }
+  }
 
-    function cleanup() {
-        if (pollTimer) {
-            clearInterval(pollTimer);
-        }
+  function init() {
+    // Try localStorage for last known hash
+    try {
+      lastHash = localStorage.getItem(STORAGE_KEY) || "";
+    } catch (e) {}
+
+    // Apply default styles immediately to avoid flash
+    applyStyles(getDefaultColors());
+
+    // Then try to fetch fresh colors
+    fetchColors();
+
+    // Poll for updates
+    pollTimer = setInterval(fetchColors, POLL_INTERVAL);
+  }
+
+  function cleanup() {
+    if (pollTimer) {
+      clearInterval(pollTimer);
     }
+  }
 
-    window.addEventListener('beforeunload', cleanup);
-    init();
-
+  window.addEventListener("beforeunload", cleanup);
+  init();
 })();

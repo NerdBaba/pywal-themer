@@ -17,7 +17,7 @@ cargo build --release
 
 ## Userscript
 
-Install `pywal-themer.user.js` in Tampermonkey. It themes YouTube, GitHub, and X (x.com/twitter.com).
+Install `pywal-themer.user.js` in Tampermonkey. It themes YouTube, GitHub, X (x.com/twitter.com), and learncpp.com.
 
 ## Requirements
 
