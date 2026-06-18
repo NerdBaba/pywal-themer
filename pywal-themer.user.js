@@ -10,6 +10,7 @@
 // @match        https://twitter.com/*
 // @match        https://www.learncpp.com/*
 // @match        https://learncpp.com/*
+// @match        https://*.wikipedia.org/*
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
@@ -1135,6 +1136,118 @@
         `;
   }
 
+
+
+
+  function getWikipediaCSS(s) {
+    return `
+            @import url('https://fonts.googleapis.com/css2?family=Golos+Text:wght@400..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+
+            /* Fonts and Base Colors */
+            html, body {
+                background-color: ${s.base} !important;
+                color: ${s.text} !important;
+                font-family: 'Nunito Sans', sans-serif !important;
+            }
+
+            /* Reset all background containers to base */
+            .mw-page-container,
+            .mw-content-container,
+            .mw-body,
+            .vector-header-container .mw-header,
+            .vector-pinned-container,
+            .vector-sticky-pinned-container::after,
+            .vector-main-menu,
+            #content,
+            #mw-content-block {
+                background: ${s.base} !important;
+                background-color: ${s.base} !important;
+                color: ${s.text} !important;
+                border: none !important;
+            }
+
+            /* Remove the "Card" effect pseudo-element */
+            .mw-body::before {
+                display: none !important;
+                content: none !important;
+            }
+
+            /* Headers - Keep Sandy Typography */
+            .mw-body h1,
+            .mw-body .mw-heading1,
+            .mw-body-content h1,
+            .mw-body-content .mw-heading1,
+            .mw-body-content h2,
+            .mw-body-content .mw-heading2,
+            .mw-headline {
+                font-family: 'Golos Text', sans-serif !important;
+                font-weight: 500 !important;
+                color: ${s.text} !important;
+                border-bottom: 1px solid ${s.border} !important;
+            }
+
+            /* Tables & Infoboxes - Subtle separation using surface color */
+            .infobox, table.wikitable {
+                background-color: ${s.surface0} !important;
+                border: 1px solid ${s.border} !important;
+                border-radius: 0.5rem !important;
+                color: ${s.text} !important;
+            }
+
+            .infobox th, .infobox td,
+            table.wikitable th, table.wikitable td {
+                background-color: transparent !important;
+                border-color: ${s.border} !important;
+            }
+
+            /* Links */
+            a, a:visited {
+                color: ${s.accent} !important;
+                text-decoration: none !important;
+            }
+
+            a:hover {
+                color: ${s.accentHover} !important;
+                text-decoration: underline !important;
+            }
+
+            /* Navigation & Sidebar */
+            .vector-toc {
+                background-color: transparent !important;
+            }
+
+            .vector-toc-link {
+                color: ${s.subtext0} !important;
+            }
+
+            .vector-toc-list-item-active > .vector-toc-link {
+                color: ${s.accent} !important;
+                font-weight: bold !important;
+            }
+
+            /* Search UI */
+            .cdx-text-input__input {
+                background-color: ${s.surface1} !important;
+                color: ${s.text} !important;
+                border: 1px solid ${s.border} !important;
+            }
+
+            /* Banners & Notices */
+            #siteNotice, #centralNotice {
+                background-color: ${s.surface0} !important;
+                border: 1px solid ${s.border} !important;
+                border-radius: 0.5rem !important;
+            }
+
+            /* Appearance Widget */
+            .vector-appearance-widget, .vector-dropdown-content {
+                background-color: ${s.surface0} !important;
+                border: 1px solid ${s.border} !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+            }
+        `;
+  }
+
   function getCurrentPageCSS(colors) {
     const s = mapPywalToSemantic(colors);
     const hostname = window.location.hostname;
@@ -1147,6 +1260,8 @@
       return getXCSS(s);
     } else if (hostname.includes("learncpp.com")) {
       return getLearncppCSS(s);
+    } else if (hostname.includes("wikipedia.org")) {
+      return getWikipediaCSS(s);
     }
 
     return "";
