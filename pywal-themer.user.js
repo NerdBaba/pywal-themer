@@ -11,6 +11,7 @@
 // @match        https://www.learncpp.com/*
 // @match        https://learncpp.com/*
 // @match        https://*.wikipedia.org/*
+// @match        https://redlib.catsarch.com/*
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
@@ -1248,6 +1249,36 @@
         `;
   }
 
+  function getRedlibCSS(colors) {
+    const c = colors || getDefaultColors();
+    const bg = c[0];
+    const text = isLight(bg) ? c[0] : c[15] || c[7];
+
+    return `
+            :root {
+                --accent: ${c[4]} !important;
+                --green: ${c[2]} !important;
+                --text: ${text} !important;
+                --foreground: ${c[8]} !important;
+                --background: ${bg} !important;
+                --outside: ${adjustColor(bg, 8)} !important;
+                --post: ${adjustColor(bg, 5)} !important;
+                --panel-border: 1px solid ${adjustColor(bg, 20)} !important;
+                --highlighted: ${adjustColor(bg, 25)} !important;
+                --visited: ${c[8]} !important;
+                --shadow: 0 1px 3px rgba(0,0,0,0.5) !important;
+                --popup: ${c[4]} !important;
+                --spoiler: ${text} !important;
+                color-scheme: ${isLight(bg) ? "light" : "dark"} !important;
+            }
+
+            ::selection {
+                color: ${bg} !important;
+                background: ${c[4]} !important;
+            }
+        `;
+  }
+
   function getCurrentPageCSS(colors) {
     const s = mapPywalToSemantic(colors);
     const hostname = window.location.hostname;
@@ -1262,6 +1293,8 @@
       return getLearncppCSS(s);
     } else if (hostname.includes("wikipedia.org")) {
       return getWikipediaCSS(s);
+    } else if (hostname.includes("redlib.catsarch.com")) {
+      return getRedlibCSS(colors);
     }
 
     return "";
