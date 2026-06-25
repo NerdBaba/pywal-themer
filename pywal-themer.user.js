@@ -1259,16 +1259,16 @@
                 --accent: ${c[4]} !important;
                 --green: ${c[2]} !important;
                 --text: ${text} !important;
-                --foreground: ${c[8]} !important;
+                --foreground: ${adjustColor(bg, 18)} !important;
                 --background: ${bg} !important;
-                --outside: ${adjustColor(bg, 8)} !important;
+                --outside: ${adjustColor(bg, 10)} !important;
                 --post: ${adjustColor(bg, 5)} !important;
-                --panel-border: 1px solid ${adjustColor(bg, 20)} !important;
-                --highlighted: ${adjustColor(bg, 25)} !important;
-                --visited: ${c[8]} !important;
+                --panel-border: 1px solid ${adjustColor(bg, 30)} !important;
+                --highlighted: ${adjustColor(bg, 40)} !important;
+                --visited: ${adjustColor(text, -60)} !important;
                 --shadow: 0 1px 3px rgba(0,0,0,0.5) !important;
                 --popup: ${c[4]} !important;
-                --spoiler: ${text} !important;
+                --spoiler: ${adjustColor(text, -40)} !important;
                 color-scheme: ${isLight(bg) ? "light" : "dark"} !important;
             }
 
